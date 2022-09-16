@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta name=viewport content="width=device-width,initial-scale=1.0">
+<title>Dealing with Time in the Roman Calendar</title>
+<link rel=icon href=favicon.png>
+<link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" > 
+
+<style>
+html{
+    font-family: 'Crimson Text', serif;
+    font-size: 20px;
+}
+body{
+    margin: 0 auto;
+    padding: 4rem 1rem 0rem 1rem;
+    max-width: 36rem;
+}
+h1{
+    font-size: 2rem;
+    line-height: 3rem;
+    text-align: center;
+    margin: 0 0 3rem 0;
+    font-weight: 400;
+}
+h2{
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 3rem 2rem 2rem 2rem;
+}
+p{
+    hyphens: auto;
+    text-align: justify;
+}
+b{
+    font-weight: 600;
+}
+a{
+    color: #fa1200;
+    text-decoration: none;
+}
+pre{
+    padding:16px;
+    font-size:16px;
+    color:#fff;
+    background-color:#222;
+}
+.fleuron{
+    display: block;
+    margin: 6rem auto;
+    text-align: center;
+    width: 3rem;
+}
+</style>
+
+<h1>Dealing with Time in the Roman Calendar</h1>
+
+<p>Properly calculating calendar dates from lower-level data manually is really annoying. You need to deal with time zones, leap days, daylight savings, leap seconds...</p>
+<p>Still, it could be worse. Much worse.</p>
+<p>Our current Gregorian calendar is a slight modification of the Julian calendar, named after Julius Caesar himself who introduced it in 45BC. If he hadn't done that, and nobody afterwards had bothered to either, we'd still be stuck with the traditional Roman calendar. Here, I collect a few “interesting” issues we'd run into when attempting to use it for modern purposes.</p>
+
+<h2>The Romans years weren't numbered</h2>
+
+<p>You might have read somewhere that the Romans counted years from <em>AUC</em> &mdash; <em><a href="https://en.wikipedia.org/wiki/Ab_urbe_condita">Ab Urbe Condita</a></em>, “from the founding of the city”. Sadly it's not going to be that easy. By far, the common method of specifying what year you were talking about was <a href="https://en.wikipedia.org/wiki/Roman_calendar#Years">to mention what consuls were serving during that time</a>. So, for example, you'd have to say something like <em>“During the consulship of L. Licinius Crassus and Q. Mucius Scaevola”</em> to refer to 95 BC.</p>
+
+<p>A consular term lasted for one year and you'd use the names of the consuls elected first &mdash; if a consul died and was replaced in the middle of the year, the name of the new consul was not used for dating.</p>
+
+<h2>The Roman year did not necessarily start at January 1</h2>
+
+<p><a href="https://en.wikipedia.org/wiki/Roman_calendar#Years">The year began when the consuls were inaugurated</a>. From 153 BC and forward it was Jan 1 (which is why our modern calendar starts there, too) but before that March 15 and before 222 BC May 1, but with many exceptions due to wartime crises or political shenanigans. The consuls led the armies, and since replacing a consul in the field was a poor strategic decision the Romans instead sometimes elected to move the entire year forwards or backwards as the situation required, as in the case of <a href="https://en.wikipedia.org/wiki/Quintus_Fulvius_Nobilior">Quintus Fulvius Nobilior</a>.</p>
+
+<h2>A Roman year does not always have a name</h2>
+
+<p>In 77 BC, <a href="https://en.wikipedia.org/wiki/Marcus_Aemilius_Lepidus_(consul_78_BC)">Marcus Aemilius Lepidus</a> rebelled. This caused the senate to declare a state of emergency, resulting in a delayed consular election and the year not having a name until later that year.
+
+<h2>The Roman January 1 is not the same as the Gregorian January 1</h2>
+
+<p>If you use a time machine on April 12 and go back 2100 years, you're very likely not going to wind up on the Roman April 12; the names might be the same, but the months are not. The Roman calendar had 355 days, so it would quickly drift out of alignment with the solar year, just like the Islamic one. To fix that, the Romans used a leap month &mdash; <a href="https://en.wikipedia.org/wiki/Mercedonius">Mercedonius</a>.</p>
+<p>Mercedonius was inserted arbitrarily when the Pontifex Maximus felt that the year was too out of alignment with the seasons, and to make matters worse the length of the intercalation wasn't fixed. In theory they'd insert it roughly every second year and make it 22 or 23 days long, but in practice it was delayed or advanced for political reasons &mdash; the Pontifex could shorten the terms for his enemies and lengthen terms for friends.</p>
+
+<h2>A Roman Year can have more than 13 unique months</h2>
+
+<p>In the year <a href="https://en.wikipedia.org/wiki/Roman_calendar#Julian_reform">46 BC</a> two extra months in addition to Mercedonius was added, <em>Intercalaris Prior</em> and <em>Intercalaris Posterior</em>, making that year 15 months long.</p>
+
+<h2>A Roman Year can have fewer than 12 unique months</h2>
+
+<p>In the very early Roman calendar before tradition states that <a href="https://en.wikipedia.org/wiki/Numa_Pompilius">Numa Pompilius</a> modified it, January and February did not exist. The winter simply did not have dates at all. The names of September to December still bear traces of that today, being named after the Roman numbers seven to ten respectively.</p>
+
+<h2>The Roman months do not always occur one after another</h2>
+
+<p>Mercedonius, the leap month, is inserted <em>in the middle</em> of February (yes, really) so during leap years we actually have 14 “ranges” of dates to take into account &mdash; the 11 regular months, the first part of February, Mercedonius, and the second part of February.</p>
+
+<h2>The Roman days of the month are not numbered in order</h2>
+
+<p>Instead of the sane method of giving each day of the month a number, the Romans had 3 <a href="https://en.wikipedia.org/wiki/Calends">special days</a> in each month:</p>
+
+<ul>
+    <li>The <em>Kalends</em>, always the first day of the month.
+    <li>The <em>Nones</em>, the 7th day of the longer months or the 5th day of the shorter months.
+    <li>The <em>Ides</em>, the 15th or 13th day of the long and short months respectively.
+</ul>
+
+<p>So, you didn't say <em>“March 15”</em>, you said <em><a href="https://en.wikipedia.org/wiki/Assassination_of_Julius_Caesar">“On the Ides of March”</a></em>. The day before that was <em>“The day before the Ides”</em>.
+Then you <a href="https://en.wikipedia.org/wiki/Counting#Inclusive_counting">skipped</a> the second day and went straight to <em>“The 3rd Day before the Ides”</em>, and continued from there.</p>
+
+<p>After the Ides you counted up to the Kalends of the next month, so “The 9th Day before the Kalends of November” was actually October 24 &mdash; and it was actually the 8th day before the Kalends in our modern way of counting.</p>
+
+<!--<h2>Names of dates in a Roman year do not always refer to an unique day</h2>
+<p>When Mercedonius is inserted into February the names of the dates in February don't change. This meant that dates in February like “The 7th Day before the Kalends of March” is actually 2 days before the Kalends of Mercedonius, and Mercedonius has its own “The 7th Day before the Kalends of March” that refers to an entirely different day even though it has the exact same name. </p>-->
+
+<h2>Names of dates in the future has an alternate format</h2>
+
+<p>What do you do if you want to specify a date in the future, but you don't know if the Pontifex Maximus is going to insert Mercedonius this year or not?</p>
+<p>The Roman solution is this: instead of specifying the month, specify the offset to the nearest public holiday that does not depend on the existence of Mercedonius (like Cicero does <a href="https://www.perseus.tufts.edu/hopper/text?doc=Perseus%3Atext%3A1999.02.0008%3Abook%3D6%3Aletter%3D1%3Asection%3D1">here</a>). This is akin to saying “4 days before Good Friday, 2021” instead of “April 29, 2021”.</p>
+
+<h2>The Roman hour is not always of the same length</h2>
+
+<p>Luckily for us, the Romans didn't use minutes or seconds. The hours are more complicated: the day is divided into day and night, and <a href="https://en.wikipedia.org/wiki/Roman_timekeeping">each has 12 hours</a>. This means that if the day is longer than the night (e.g. in the Italian summer) an hour during the day is a fair bit longer than an hour during the night!</p>
+
+<p>So, when we want to know the time we'll need to take into account the observers latitude <em>and</em> longitude to calculate when the sunrise happens that day, and thus how long an hour is.</p>
+
+<p>This mess actually causes trouble for us when we want to know what year it is, too &mdash; the Roman day starts at midnight, but midnight is in the exact middle between sundown and sunrise, and that's not always 00:00! This means that when we have a modern time of e.g. 00:03 it might still be the previous day in the Roman calendar depending on the observers latitude, and thus sometimes an entirely different year. </p>
+
+<h2>The Romans did not use our seven-day week</h2>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Nundinae">Roman week</a> is eight days, not seven, and they themselves referred to it as a nine-day week due to their aforementioned confusing method of counting ranges. The eight day &mdash; the “Nundinae” &mdash; is the market day, analogous to our weekend; children were exempt from school, patricians did not conduct business and public assemblies were <a href="https://en.wikipedia.org/wiki/Lex_Hortensia">banned</a>.</p>
+
+<h2>The names of the Roman weekdays changed every year</h2>
+
+<p>The Roman days are named after letters of the Alphabet, from <b>A</b> to <b>H</b>. This would have given the weekdays a fixed name, if it wasn't for the fact that the letter always reset to <b>A</b> on the Kalends on January and to <b>G</b> on the Kalends of Mercedonius. This means that finding out that it's e.g. <b>C</b>-day today does not tell you much in isolation!</p>
+
+<h2>A Roman week was not always eight days</h2>
+
+<p>At least <a href="http://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/48*.html#33.4">one week in 41 BC was nine days long,</a> and another unspecified week in the same year one day shorter. This was done so that the first day first day of the year wouldn't coincide with the market day which was considered bad luck.</p>
+
+<h2>The Roman weekday is not the same everywhere</h2>
+
+<p>From graffiti know that the nundinae in Pompeii occurred <a href='https://www.instonebrewer.com/TyndaleSites/Egypt/ptolemies/chron/roman/ad60.htm'>four days after</a> that of the nundinae in Cumae, and the market in Rome was two days after that; i.e every major city has its own weekday-timezone.</p>
+
+<svg class=fleuron viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#ccc" d="M28.4 83.4q-4.8 0-7.3-2.2-2.3-2.3-2.3-5.4 0-2.5 1.1-4.6 1.2-2 2.6-3.4 1.4-1.4 2-1.4t.7.4l-.4.8q-.5.6-.5 2 0 2.5 2.1 4.8t6.3 2.3q4.1 0 8.5-2.7 4.4-2.6 8.5-6.5 4.1-4 7.3-7.7l5.2-6.1q-6.4 3.2-14 6-7.6 2.6-17.8 2.6-9.5 0-16-3.2-6.4-3.2-9.7-8-3.2-4.8-3.2-9.8 0-3.6 1.2-6.6 1.3-3 3.1-5 1.8-2.2 3.2-3.3 1.5-1 2-1 .6 0 .6.5 0 .3-.7 1.3-.7.9-1.5 2.5t-.7 4.6q0 5.7 3.3 10.5 3.4 4.6 9.6 7.5Q27.9 55 36.5 55q10 0 17.3-2.5 7.3-2.7 13.6-5.6l-8-8.4q-4-4.3-8.1-7.9-4.1-3.6-8.3-5.8-4-2.3-8-2.3-3 0-4.1 2-1.2 1.8-1.2 3.6 0 2.5 1.5 4.7 1.5 2.1 3.8 3.5t4.9 1.3l1.5-.1 1-.2q.2 0 .2.2 0 .5-1.3 1.8-1 1.3-1.8 1.8-1 .8-2.4 1.3-1.3.6-3.2.6-3.2 0-6.3-2.4-3-2.5-3-7.4 0-4.7 2.5-8.4t6-6q3.6-2.2 7-2.2 4.2 0 8.6 2.6 4.6 2.5 9 6.6 4.6 4 9 8.6l8.3 8.8q3.6-1.5 7.4-2.5 3.7-1.1 8-1.1 4 0 6 2 2.1 1.8 2.1 4.7 0 3.4-2.2 6.6-2.2 3.1-5.5 5.2-3.3 2-6.7 2-2.7 0-6.3-3-3.6-3-7.8-7.4l-2.2 1.1-6 6.7-7.4 8.4q-4.1 4.5-8.5 8.4-4.5 4-9 6.6-4.4 2.5-8.5 2.5zm57.9-38.2q-2.1 0-4.1.3t-4 1q3.4 3.3 6.3 5.5 3 2.1 5.2 2.1 1.6 0 2.8-1 1.4-1.3 1.4-2.6 0-2.2-2.1-3.8-2-1.5-5.5-1.5z"/>
+</svg>

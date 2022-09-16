@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<title>Notes on working with C and WebAssembly</title>
+<meta name=viewport content='width=device-width,initial-scale=1'>
+<meta charset='utf-8'>
+
+<style>
+body{
+    margin: 0;
+    font-family: 'Source Sans Pro', 'sans-serif';
+    background-color: #e2e2e2;
+}
+main{
+    overflow: auto;
+    margin: 0 auto;
+    padding: 0 80px 100px 80px;
+    max-width: 800px;
+    background-color: #f2f2f2;
+}
+@media (max-width: 960px){
+    body{ background-color: #f2f2f2; }
+    main{ padding: 0 20px 100px 20px; }
+}
+pre{
+    padding: 10px;
+    color: white;
+    background-color: #333;
+    white-space: pre-wrap;
+}
+li{
+    margin-bottom: 1em;
+}
+a{
+    text-decoration: none;
+    color: #2962ad;
+}
+</style>
+
+<main>
+<h1>Notes on working with C and WebAssembly</h1>
+
+<p>If you would like to make extremely lean software for the web, C &amp; WebAssembly is one option. Truthfully the only really practical way of doing that has been to use <a href='https://github.com/kripken/emscripten'>Emscripten</a>, emulating a lot of what you expect from a normal C environment in Javascript at the cost of a fair bit of overhead.</p>
+
+<p>If you have a "every byte is precious" attitude like me (and like to get your hands dirty!) you can certainly do it yourself, as well. The available information online is rather sparse, so this page mostly consists of things I've discovered toying around with just that.</p>
+
+<p>I was able to make a <a href='#demo'>WebGL2 demo</a> in 6.2KiB (uncompressed, not counting textures) without too much effort, so expect to get results around that magnitude for tasks of similar complexity.</p>
+
+<h2>Building</h2>
+
+<p>To generate WebAssembly binaries, you need LLVM, clang, and lld. Stable &ndash; 5.0, at the time of writing &ndash; won't cut it, so build it from source. Sadly LTO doesn't work, so we need to fiddle around with the IR.</p>
+
+<p>First, let's turn each of our C source files into LLVM IR bitcode. This can be done like so:</p>
+
+<pre>clang -cc1 -Ofast -emit-llvm-bc -triple=wasm32-unknown-unknown-wasm -std=c11 -fvisibility hidden src/*\.c</pre>
+
+<ul>
+    <li><b>-fvisibility hidden</b><br>Prevents all the functions in the source from being exported except the ones we explicitly designate later on.</li>
+    <li><b>-Ofast</b><br>Gotta go fast. This is like <em>-O3</em>, except we assume that a whole bunch of specific floating-point behaviour (e.g.&nbsp;INFs) won't happen &ndash; a lot of it will trap the WebAssembler environment anyway, so there's not much point in taking it into account. Use <em>-O3</em> instead if you care about boring things like standards compliance and preventing undefined behaviour &#x1f609;.</li>
+</ul>
+
+<p>Combine all the bitcode into one and optimize it again:</p>
+
+<pre>llvm-link -o wasm.bc src/*\.bc
+opt -O3 wasm.bc -o wasm.bc</pre>
+
+<p>Next step is actually compiling it:</p>
+
+<pre>llc -O3 -filetype=obj wasm.bc -o wasm.o</pre>
+
+<p>Linking can now be done with lld.</p>
+
+<pre>wasm-ld --no-entry wasm.o -o binary.wasm --strip-all -allow-undefined-file wasm.syms --import-memory</pre>
+
+<ul>
+    <li><b>--no-entry</b><br>Don't bother with the lack of a <em>main</em> function. We'll call our functions from Javascript when we need to, so having a global entry point doesn't really make sense.</li>
+    <li><b>--strip-all</b><br>We only want to expose a select few entry points to our program; this strips away all the others. Given that we compiled the sources with <em>-fvisibility hidden</em>, only functions marked with <em>__attribute__((visibility("default")))</em> (typedef'ed to something not as nasty) will be exposed to our Javascript.</li>
+    <li><b>--allow-undefined-file wasm.syms</b><br>We are going to want to call Javascript from our WebAssembly, as well &ndash; <em>wasm.syms</em> contains a list of the names of those functions.</li>
+    <li><b>--import-memory</b><br>We'll supply the memory ourselves from Javascript. We need to do so since the flag <em>--inital-memory</em> which we want to use is broken and doesn't seem to do anything.</li>
+</ul>
+
+<p>Note that if you are running a version later than <a href='https://github.com/llvm-mirror/lld/commit/bf5a2d882e292886dd9aa8d54042b6cf62792449'>this commit</a>, you'll need to add "--export-dynamic" as well to prevent wasm-lld stripping absolutely everything.</p>
+
+
+<h2>Running</h2>
+
+<p>Our binary is now ready for use. Let's whip up some JS to do so:</p>
+
+<pre>let imports = {};
+let memory = null;
+let exports = null;
+
+let request = await fetch( 'binary.wasm' );
+let binary = await request.arrayBuffer();
+
+imports['memory'] = new WebAssembly['Memory']( {'initial':32} );
+memory = new Uint8Array( imports['memory']['buffer'] );
+let program = await WebAssembly['instantiate']( binary, { "env":imports } );
+
+let instance = program['instance'];
+exports = instance['exports'];
+</pre>
+
+<ul>
+    <li><b>imports</b><br>This is a dictionary of functions we will be able to call from inside our WebAssmebly program.</li>
+    <li><b>memory</b><br>32 pages of wasm memory totalling 2MiB. I need that much to work on textures in the demo; loading a 512²-texel 4-component texture requires at least 1MiB, for example.</li>
+    <li><b>exports</b><br>A dictionary of C functions that we marked visible. They can now be called like any other JS function.</li>
+    <li><b>['instantiate']</b><br>I call WebAssembly functions like that since the Closure Compiler hasn't gotten the wasm symbols into its whitelist yet; this prevents them from being minified.</li>
+</ul>
+
+<h2>Calling Javascript from C</h2>
+
+<p>All functions you want to be able to call from the WebAssembly module should be placed into <em>imports</em>, like so:</p>
+
+<pre>imports['print_num'] = function( n ){
+    console.log( "Your number is " + n  );
+    return 123;
+};
+</pre>
+
+<p>Secondly, create declaration for it in a C header somewhere. The only types you can use are <em>i32</em>, <em>f32</em>, and <em>f64</em>; I'll go over how to pass buffers and strings shortly.</p>
+
+<pre>typedef signed int i32;
+
+[...]
+
+i32 print_num( i32 n );</pre>
+
+<p>Finally, add the name of the function to <em>wasm.syms</em> so that the linker won't complain. You can then call the function to your hearts content.</p>
+
+<h2>Calling C from Javascript</h2>
+
+<p>Add <em>__attribute__((visibility("default")))</em> to the function you want to call, so it won't get stripped out:</p>
+
+<pre>#define export __attribute__( ( visibility( "default" ) ) 
+
+[...]
+
+export i32 some_func( i32 n )
+{
+    return n+1;
+}
+</pre>
+
+<p>Then you can immediately go ahead and call it from <em>exports</em>. Easy!</p>
+
+<pre>exports['some_func']( 1 );</pre>
+
+<h2>Passing memory and strings</h2>
+
+<p>This is a little trickier than just returning an integer. From C, you return a pointer to the memory, as well as the length:</p>
+
+<pre>void console_log( i32 str, i32 len );
+
+[...]
+
+const char * string = "Hello World!";
+console_log( string, strlen(string) );
+</pre>
+
+<p>With the help of the memory object, you can get the bytes in question from Javascript. The TextDecoder interface can then convert it to a string if so desired.</p>
+
+<pre>let utf8decoder = new TextDecoder( "utf-8" );
+
+[...]
+
+function console_log( str, len ){
+    let arr = memory.subarray( str, str+len );
+    console.log( utf8decoder.decode( arr ) );
+}
+</pre>
+
+<p>Passing data the other way requires you to allocate space in C, and then blit the data into the <em>memory</em> object from Javascript.</p>
+
+<h2>Passing objects</h2>
+
+<p>You can't. To operate on e.g. WebGL objects, you'll need to store them JS-side and return an integer reference to it.</p>
+
+<p>Here's an example how you might do it:</p>
+
+<pre>let gl_id_freelist = [];
+let gl_id_map = [ null ];
+
+[...]
+
+function webgl_id_new( obj ){
+    if( gl_id_freelist.length == 0 )
+    {
+        gl_id_map.push( obj );
+        return gl_id_map.length - 1;
+    }
+    else
+    {
+        let id = gl_id_freelist.shift();
+        gl_id_map[id] = obj;
+        return id;
+    }
+}
+
+function webgl_id_remove( id ){
+    delete gl_id_map[id];
+    gl_id_freelist.push( id );
+}
+
+[...]
+
+imports["glCreateShader"] = function( type ){
+    let shader = gl.createShader( type );
+    let shader_id = webgl_id_new( shader );
+    return shader_id;
+}
+
+imports["glDeleteShader"] = function( shader_id ){
+    let shader = gl_id_map[shader_id];
+    gl.deleteShader( shader );
+    webgl_id_remove( shader_id );
+}
+</pre>
+
+<h2>The standard C library</h2>
+
+<p>Naturally none of it is available, so we'll have to implement what we want ourselves. Since we can't use <em>malloc</em> and friends, we'll either have to:</p>
+
+<ul>
+    <li>Write them ourselves, by e.g. reserving portions of a large buffer allocated statically.</li>
+    <li>Use VLAs instead, putting all working memory on the stack as we go. The things you can do with it is somewhat limited though (no memory resizing, no data persistence when calling a wasm function multiple times).</li>
+</ul>
+
+<p>In the future there will probably be implementations of <em>malloc</em> written as separate wasm modules that you could link into your own, but no such luck yet.</p>
+
+<h2>Builtins</h2>
+
+<p>Fortunately clang has <a href='https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/Builtins.def'>a few builtin functions</a>, mostly for string handling, bit twiddling, and trigonometry. To use them you can simply call <em>__builtin_cosf()</em> or the like; you won't need a header or anything. There's no guarantee that LLVM won't just try to insert a call to the non-existant C library function anyway however, so it's probably not something you should rely on outside of simple demos and such.</p>
+
+<h2>Futher optimizations with Binaryen</h2>
+
+<p>The <a href='https://github.com/WebAssembly/binaryen'>Binaryen</a> toolchain includes <em>wasm-opt</em>, a tool that reads WebAssembly, optimizes it, and then spits it out again. It shrinks my program by 10%  or thereabouts, but your mileage may vary.</p>
+
+<pre>wasm-opt -Oz binary.wasm -o binary_opt.wasm</pre>
+
+<p>If you have large buffers allocated statically, LLVM insits on including them verbatim in the binary. wasm-opt will strip it out, so significant gains might be had in that case.</p>
+
+<h2 id=demo>Demo</h2>
+
+<p>You can find the demo I did <a href='demo'>here</a>. The source is available on <a href='https://github.com/Aransentin/wasmdemo'>Github</a> as well.</p>
+
+</main>
