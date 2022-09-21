@@ -1,0 +1,104 @@
+html{
+    font-size: 20px;
+    font-family: sans-serif;
+    background-color: #ddd;
+    color: #111;
+}
+
+body{
+    margin: 0;
+}
+
+main{
+    margin: 0 auto;
+    max-width: 960px;
+    padding: 1rem;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background-color: #eee;
+}
+
+section{
+    margin: 2rem auto;
+    max-width: 700px;
+}
+
+h1{
+    margin: 1rem 1rem 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 1.5rem;
+    text-align: center;
+    padding-bottom: 1.0rem;
+    border-bottom: 0.1rem #333 solid;
+}
+
+h2{
+    font-weight: 700;
+    font-size: 1.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 0.2rem solid #333;
+}
+
+p{
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.3rem;
+}
+
+a{
+    text-decoration: none;
+}
+
+figure{
+    margin: 0 0 0.5rem 0;
+    width: 10rem;
+}
+figure>img{
+    width: 100%;
+}
+figcaption{
+    text-align: center;
+    text-wrap: wrap;
+    font-size: 0.65rem;
+}
+
+.fleuron{
+    display: block;
+    margin: 3rem auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-image: url(fleuron.svg);
+}
+
+@media (max-width: 1024px) {
+    html{
+        font-size: 18px;
+    }
+    main{
+        max-width: none;
+    }
+    figure{
+        width: 8rem;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    html{
+        color: #edf1f6;
+    }
+    body{
+        background-color: #161616;
+    }
+    main{
+        background-color: #1c1c1c;
+    }
+    a{
+        color: #80d0ff;
+    }
+    a:visited{
+        color: #6d4b8d;
+    }
+    .fleuron{
+        background-image: url(fleuron_dark.svg);
+    }
+}

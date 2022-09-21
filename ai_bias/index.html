@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang=en>
+<title>Ideal AI Debiasing</title>
+<meta name=viewport content='width=device-width,initial-scale=1'>
+<link rel=stylesheet href="../style.css">
+
+<main>
+    <h1>Ideal AI Debiasing</h1>
+
+    <section>
+        <p>The chief concern of current anti-bias efforts in generative machine learning is clearly not to make a better product, but to ward against vulture journalists probing for their next hit piece.</p>
+        <p>High-profile American AI companies are genuinely scared of opening The New York Times and reading an exposé on how their product is the worst thing since Jim Crow, Hitler, and Joe Rogan combined. To prevent this, the right rituals are required &ndash; some corporate statements backing inclusivity, a few public-facing employees with the right gender and ethnicity, and having made an actual technical attempt to solve the issue, no matter how poorly.</p>
+        <p>Doing this neuters criticism from "this company is racist" to "the efforts of this company to combat racism isn't very efficient", which is not a story anybody cares about enough to attract any sharks.</p>
+        <p>I think the evidence is clear that the current efforts of AI companies to debias their products are actually poorly crafted, inefficient, implemented as ad-hoc afterthoughts, and purposefully designed to be circumvented:</p>
+        <ul>
+            <li>
+                <p>The OpenAI "solution" is to search for strings in the prompt that indicate there's a person being represented (like "doctor"), and then <a href='https://twitter.com/rzhang88/status/1549472829304741888'>randomly sprinkling in affixes like "black male"</a> after the prompt.</p>
+                <p>Not only is this probably the ugliest hack possible, it frequently <a href='https://labs.openai.com/s/fxB6F3SOGQ2aBURPJsrKwinh'>completely messes up prompts</a> and isn't even too difficult to circumvent with a little prompt-crafting skill. What it does have going for it is that it tricks journalists doing bare-minimum research for their hit pieces, so it successfully fulfills its purpose.</p>
+            </li>
+            <li>
+                <p>Stability AI utilizes a secondary neural network to detect and censor images containing problematic content such as nudity and violence, as well as embedding imperceptible watermarks in the generated data. This "safety checker" component was added only <a href='https://github.com/CompVis/stable-diffusion/pull/36'>a few days before the public release</a>, and moreover is trivially easy to circumvent by anybody with a modicum of Python knowledge.</p>
+            </li>
+        </ul>
+        <p>I think this state is unfortunate. Bias in neural networks is a genuinely important topic, which if implemented with the right approach could <em>really</em> greatly improve the output of them.</p>
+    </section>
+
+    <section>
+        <h2>What is bias, really?</h2>
+        <figure style="float:right; margin-left:1rem;">
+            <img src=president.webp alt="'Female President of the United States [...]', Stable Diffusion">
+            <figcaption>'Female President of the United States [...]', Stable Diffusion</figcaption>
+        </figure>
+        <p>I would say bias (in generative models) is outputs that do not accurately reflect reality. There is a second idea that biased models shouldn't strive to reflect reality, but an <em>ideal</em> reality without e.g. racial and gender discrimination. Such a model would, for example, generate a woman fifty percent of the time when prompted "President of the United States". In some contexts this might be perfectly desirable; such as when you want to represent an ideal (advertising, illustrations), or directly useful, such as when you want to generate content with as much reasonable variety as possible.</p>
+        
+        <p>Such a model could also be genuinely more flexible than a "realistic" model, as it will be more open to variety for various subjects. A model that has learned to generate an US president of various races and genders might very well be better at making a "Victorian steampunk robot" president. I'm not going dwell on this too much, but note that everything else in this article would apply to this approach as well, just targeting a different "world" than the real one.</p>
+    </section>
+
+    <section>
+        <h2>Expressed bias</h2>
+        <p>A mistake people make is that bias only concerns attributes of people, such as race and gender, when that is only a minor subset of the larger problem. The issue is that the corpuses used for training the models contains a large amount of errors of various types, and those errors are carried forward into the models.</p>
+        <p>Consider a user trying to generate a picture using the prompt <em>"A medieval knight in battle"</em>. The model, having seen knights before in movie stills, on DeviantArt & ArtStation, in video game screenshots, etc. will dutifully start painting something like that. Since the public in general has a very poor understanding of how medieval knights actually looked, it'll likely result in a hodgepodge of different renaissance-era and impractical fantasy equipment.</p>
+        <p>A better model would know what a medieval knight actually had available and paint that, using the best information available to us on the subject.</p>
+        <p>Similarly, a common issue is the large amount of faux cultural memories that poison the data. An especially salient example is the "80s", which if prompted for will start spitting out glowing neon colours everywhere due to the large amount of synthwave content online.</p>
+        <p>Another example is that if you generate content that has anything to do with Norse mythology, you'll inevitably get "infected" with data from the Marvel movies due to their Thor/Loki/Odin characters.</p>
+    </section>
+
+    <section>
+        <h2>Why?</h2>
+        <p>Solving this problem will be hard, and probably require significant human effort curating content. I still think it'd be worth it.</p>
+        <figure style="float:left; margin-right: 1rem">
+            <img src=ww2_redcoats.webp alt="'British Redcoats in Normandy, WW2 [...]', Stable Diffusion">
+            <figcaption>'British Redcoats in Normandy, WW2 [...]', Stable Diffusion</figcaption>
+        </figure>
+        <p>I want my machine learning models to express humanity's best understanding of reality, not the average mediocrity of all the content out there. When I generate my medieval knight, I want the model to decide on a time period and culture behind the scenes and generate something that would make sense, and not something just as absurd as a WW2 Normandy landing by musket-wielding redcoats.</p>
+        <p>I want to actually learn about things when I interact with the system, albeit "passively" by gaining an unconscious sense of the facts that is closer to how things really are &ndash; not just reinforce false notions from popular culture.</p>
+        <p>I want to break the self-reinforcing bubbles of historical and cultural ignorance. If somebody prompts "A doctor in Africa", I want the model to pick a statistically likely person and scene, not a foreign volunteer beside a straw hut. If not, the models will just continue the cycle of people creating mistaken content based on older mistaken content in infinite spiral of knowledge decay.</p>
+        <p>Adding "black male" to 10% of the prompts solves none of this, or even minimally pushes the bias towards a more accurate distribution. For the majority of cases it just makes it worse.</p>
+    </section>
+
+    <div class=fleuron></div>
+</main>
+ 
