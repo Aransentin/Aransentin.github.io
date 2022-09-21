@@ -21,7 +21,7 @@
                 <p>Stability AI utilizes a secondary neural network to detect and censor images containing problematic content such as nudity and violence, as well as embedding imperceptible watermarks in the generated data. This "safety checker" component was added only <a href='https://github.com/CompVis/stable-diffusion/pull/36'>a few days before the public release</a>, and moreover is trivially easy to circumvent by anybody with a modicum of Python knowledge.</p>
             </li>
         </ul>
-        <p>I think this state is unfortunate. Bias in neural networks is a genuinely important topic, which if implemented with the right approach could <em>really</em> greatly improve the output of them.</p>
+        <p>I think this state is unfortunate. Debiasing neural networks is a genuinely important topic, which if implemented with the right approach could <em>really</em> greatly improve the output of them.</p>
     </section>
 
     <section>
@@ -37,7 +37,7 @@
 
     <section>
         <h2>Expressed bias</h2>
-        <p>A mistake people make is that bias only concerns attributes of people, such as race and gender, when that is only a minor subset of the larger problem. The issue is that the corpuses used for training the models contains a large amount of errors of various types, and those errors are carried forward into the models.</p>
+        <p>A mistake people make is that bias only concerns attributes of people, such as race and gender, when that is only a minor subset of the larger problem. The issue is that the corpuses used for training the models contains a large amount of errors of various types, and those errors are carried forward into the output.</p>
         <p>Consider a user trying to generate a picture using the prompt <em>"A medieval knight in battle"</em>. The model, having seen knights before in movie stills, on DeviantArt & ArtStation, in video game screenshots, etc. will dutifully start painting something like that. Since the public in general has a very poor understanding of how medieval knights actually looked, it'll likely result in a hodgepodge of different renaissance-era and impractical fantasy equipment.</p>
         <p>A better model would know what a medieval knight actually had available and paint that, using the best information available to us on the subject.</p>
         <p>Similarly, a common issue is the large amount of faux cultural memories that poison the data. An especially salient example is the "80s", which if prompted for will start spitting out glowing neon colours everywhere due to the large amount of synthwave content online.</p>
@@ -53,7 +53,7 @@
         </figure>
         <p>I want my machine learning models to express humanity's best understanding of reality, not the average mediocrity of all the content out there. When I generate my medieval knight, I want the model to decide on a time period and culture behind the scenes and generate something that would make sense, and not something just as absurd as a WW2 Normandy landing by musket-wielding redcoats.</p>
         <p>I want to actually learn about things when I interact with the system, albeit "passively" by gaining an unconscious sense of the facts that is closer to how things really are &ndash; not just reinforce false notions from popular culture.</p>
-        <p>I want to break the self-reinforcing bubbles of historical and cultural ignorance. If somebody prompts "A doctor in Africa", I want the model to pick a statistically likely person and scene, not a foreign volunteer beside a straw hut. If not, the models will just continue the cycle of people creating mistaken content based on older mistaken content in infinite spiral of knowledge decay.</p>
+        <p>I want to break the self-reinforcing bubbles of historical and cultural ignorance. If somebody prompts "A doctor in Africa", I want the model to pick a statistically likely person and scene, not a foreign volunteer beside a straw hut. If not, the models will just continue the cycle of people creating mistaken content based on older mistaken content in infinite spiral of popular knowledge decay.</p>
         <p>Adding "black male" to 10% of the prompts solves none of this, or even minimally pushes the bias towards a more accurate distribution. For the majority of cases it just makes it worse.</p>
     </section>
 
